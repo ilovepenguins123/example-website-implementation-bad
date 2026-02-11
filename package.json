@@ -1,0 +1,14 @@
+{
+  "name": "retardedsite",
+  "version": "1.0.0",
+  "description": "AutoSecure API server with authentication frontend",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "node --watch main.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "ws": "^8.14.0"
+  }
+}
